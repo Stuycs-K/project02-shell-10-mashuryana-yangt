@@ -25,7 +25,7 @@ int main(){
         }
         if(line[0] != '\0'){
             //command executer
-            
+
         }
     }
     return 0;
