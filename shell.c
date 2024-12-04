@@ -31,7 +31,13 @@ void main(char* args){
     })
     popen();
 }
-
+int redirectOut(char * newOut){
+  int fd1 = open(newOut, O_WRONLY | O_TRUNC | O_CREAT);
+  int stdout = STDOUT_FILENO;
+  int backup_stdout = dup( stdout ); // save stdout for later
+  dup2(fd1, stdout); 
+  return backup_stdout;
+}
 void exit_process(int backup_stdout){
   fflush(stdout);
   int stdout = STDOUT_FILENO;
