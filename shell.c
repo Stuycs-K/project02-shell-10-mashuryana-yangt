@@ -32,3 +32,8 @@ void main(char* args){
     popen();
 }
 
+void exit_process(int backup_stdout){
+  fflush(stdout);
+  int stdout = STDOUT_FILENO;
+  dup2(backup_stdout, stdout);
+}
