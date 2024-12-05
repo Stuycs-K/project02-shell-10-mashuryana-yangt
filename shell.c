@@ -4,6 +4,15 @@
 #include <unistd.h>
 #include "shell.h"
 
+
+void execute_line(char *line){ //process line into commands
+    char **commands = split_line(line, ";"); //splitter func
+    for(int i =0; commands[i]!=NULL; i++){
+        execute_command(commands[i]); //command executer func
+    }
+    free(commands);
+
+}
 int main(){
     char directory[1024];
     while(1){
@@ -24,7 +33,7 @@ int main(){
             line[length-1] = '\0';
         }
         if(line[0] != '\0'){
-            //command executer
+            execute_line(line); // line executer
 
         }
     }
