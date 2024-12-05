@@ -24,6 +24,14 @@ char **split_line(char *line, const char *delim){
     }
     return tokens;
 }
+void execute_command(char *command){
+    char **args = split_line(command, " ");
+    if (args == NULL || args[0] == NULL){
+        free(args);
+        return;
+    }
+    //cd & exit here
+}
 void execute_line(char *line){ //process line into commands
     char **commands = split_line(line, ";"); //splitter func
     for(int i =0; commands[i]!=NULL; i++){
