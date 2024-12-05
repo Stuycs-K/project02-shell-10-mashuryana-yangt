@@ -4,7 +4,26 @@
 #include <unistd.h>
 #include "shell.h"
 
+char **split_line(char *line, const char *delim){
+    char **tokens = NULL;
+    char *token;
+    int count = 0;
 
+    while((token=strsep(&line, delim)) != NULL){
+        if(token != '\0'){
+            tokens = realloc(tokens, (count+2) *sizeof(char *));
+            if(!tokens){
+                perror("realloc");
+                exit(1);
+            }
+            tokens[count++] = token;
+        }
+    }
+    if(tokens != NULL){
+        tokens[count] = NULL;
+    }
+    return tokens;
+}
 void execute_line(char *line){ //process line into commands
     char **commands = split_line(line, ";"); //splitter func
     for(int i =0; commands[i]!=NULL; i++){
