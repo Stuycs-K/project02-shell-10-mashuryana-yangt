@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -pedantic -std=c99
 
-TARGET = my_shell
+TARGET = shell
 SRC = shell.c
 HDR = shell.h
 OBJ = $(SRC:.c=.o)
