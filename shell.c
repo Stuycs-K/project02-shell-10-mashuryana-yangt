@@ -41,8 +41,24 @@ void execute_command(char *command){
         exit(0);
     }
     else{
-        //fork
+       pid_t pid = fork();
+       if(pid == 0){
+        execvp(args[0], args);
+        perror("execvp");
+        exit(1);
+       }
+       else if(pid >0){
+        int status;
+        wait(&status);
+        if (WIFEXITED(status)){
+            printf("Process exited with status: $d\n", WEXITSTATUS(status));
+        }
+       }
+       else{
+        perror("Fork");
+       }
     }
+    free(args);
 }
 void execute_line(char *line){ //process line into commands
     char **commands = split_line(line, ";"); //splitter func
