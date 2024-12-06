@@ -30,7 +30,19 @@ void execute_command(char *command){
         free(args);
         return;
     }
-    //cd & exit here
+    if (strcmp(args[0], "cd") == 0){
+        if(args[1] == NULL || chdir(args[1])!= 0){
+            perror("cd");
+        }
+    }
+    else if(strcmp(args[0], "exit") == 0){
+        printf("Exiting shell...\n");
+        free(args);
+        exit(0);
+    }
+    else{
+        //fork
+    }
 }
 void execute_line(char *line){ //process line into commands
     char **commands = split_line(line, ";"); //splitter func
