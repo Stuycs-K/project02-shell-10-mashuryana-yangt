@@ -1,18 +1,12 @@
-CC = gcc
-CFLAGS = -Wall -Wextra -pedantic -std=c99
+.PHONY: clean run compile
 
-TARGET = shell
-SRC = shell.c
-HDR = shell.h
-OBJ = $(SRC:.c=.o)
-
-all: $(TARGET)
-
-$(TARGET): $(OBJ)
-	$(CC) $(CFLAGS) -o $(TARGET) $(OBJ)
-
-%.o: %.c $(HDR)
-	$(CC) $(CFLAGS) -c $< -o $@
-
-clean:
-	rm -f $(OBJ) $(TARGET)
+clean: 
+	@rm -f *.o shell
+compile: shell
+	@gcc -o shell shell.o
+shell.o: shell.c shell.h
+	@gcc -c shell.c -o shell.o
+shell: shell.o
+	@gcc shell.o -o shell
+run: compile
+	@./shell $(ARGS)
