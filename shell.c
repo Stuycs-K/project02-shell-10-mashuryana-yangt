@@ -119,6 +119,65 @@ void execute_command(char *command){
     
     free(args);
 }
+
+void handle_pipe(char *input) { //added for merge
+    char *cmd1 = strsep(&input, "|"); //strsep instead of strtok
+    char *cmd2 = input;
+
+    if (cmd1 == NULL || cmd2 == NULL) {
+        fprintf(stderr, "Invalid pipe syntax\n");
+        return;
+    }
+
+    int pipefd[2];
+    if (pipe(pipefd) == -1) {
+        perror("pipe failed");
+        return;
+    }
+    pid_t pid1 = fork();    // changed this part a bit
+    int status;
+    if (pid1 == 0) {
+        // Child 1: Output to pipe
+        close(pipefd[0]);
+        dup2(pipefd[1], STDOUT_FILENO);
+        close(pipefd[1]);
+
+        // run(cmd1);
+        // exit(EXIT_FAILURE);
+
+        char **args1 = split_line(cmd1, " ");
+        execvp(args1[0], args1);
+        perror("execvp failed for the first command");
+        exit(1);
+
+    }
+    pid_t pid2 = fork();
+    if (pid2 == 0) {
+        // Child 2: Input from pipe
+        close(pipefd[1]);
+        dup2(pipefd[0], STDIN_FILENO);
+        close(pipefd[0]);
+        // run(cmd2);
+        // exit(EXIT_FAILURE);
+        char **args2 = split_line(cmd2, " ");
+        execvp(args2[0], args2);
+        perror("execvp failed for the second command");
+        exit(1);
+    }
+
+    // Parent: Close pipe and wait
+    close(pipefd[0]);
+    close(pipefd[1]);
+    wait(&status);
+    if(WIFEXITED(status)){
+        printf("First child exited with status %d\n", WEXITSTATUS(status));
+    }
+    wait(&status);
+    if(WIFEXITED(status)){
+        printf("First child exited with status %d\n", WEXITSTATUS(status));
+    }
+}
+
 void execute_line(char *line){ //process line into commands
     char **commands = split_line(line, ";"); //splitter func
     for(int i =0; commands[i]!=NULL; i++){
