@@ -25,6 +25,39 @@ char **split_line(char *line, const char *delim){
     }
     return tokens;
 }
+
+void mychdir(char *path) { //added for merging
+    path[strcspn(path, "\n")] = '\0'; 
+    if (chdir(path) != 0) {
+        perror("chdir failed");
+    }
+}
+void mygetcwd() { //added for merging
+    char cwd[1024];
+    if (getcwd(cwd, sizeof(cwd)) != NULL) {
+        if(strcmp(cwd, "/") == 0){ //added
+            printf("~");
+        }
+        else{
+        printf("%s", cwd);
+        }
+    } else {
+        perror("getcwd failed");
+    }
+}
+
+int redirectOut(char *newOut) { //added for merge 
+    int fd = open(newOut, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    if (fd < 0) {
+        perror("open failed");
+        return -1;
+    }
+    int backup_stdout = dup(STDOUT_FILENO);
+    dup2(fd, STDOUT_FILENO);
+    close(fd);
+    return backup_stdout;
+}
+
 void execute_command(char *command){
     char **args = split_line(command, " ");
     if (args == NULL || args[0] == NULL){
