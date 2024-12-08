@@ -12,7 +12,7 @@ char **split_line(char *line, const char *delim){
     int count = 0;
 
     while((token=strsep(&line, delim)) != NULL){
-        if(token != '\0'){
+        if(token[0] != '\0'){
             tokens = realloc(tokens, (count+2) *sizeof(char *));
             if(!tokens){
                 perror("realloc");
@@ -69,22 +69,37 @@ void redirectIn(char *filename){
     close(fd);
 }
 
+void handle_redirection(char **args){
+    for (int i= 0; args[i] != NULL; i++){
+        if (strcmp(args[i], ">")== 0){
+            redirectOut(args[i+1]); 
+            args[i] = NULL; 
+            break;
+        } else if(strcmp(args[i], "<")== 0){
+            redirectIn(args[i+1]); 
+            args[i] = NULL; 
+            break;
+        }
+    }
+}
+
 void execute_command(char *command){
     char **args = split_line(command, " ");
     if (args == NULL || args[0] == NULL){
         free(args);
         return;
     }
-    if (strchr(command, '>')){
-        char *output = args[2];
-        redirectOut(output);
-        args[2] = NULL;
-    }
-    else if(strchr(command, '<')){
-        char *input = args[2];
-        redirectIn(input);
-        args[2] = NULL;
-    }
+    handle_redirection(args);
+    // if (strchr(command, '>')){
+    //     char *output = args[2];
+    //     redirectOut(output);
+    //     args[2] = NULL;
+    // }
+    // else if(strchr(command, '<')){
+    //     char *input = args[2];
+    //     redirectIn(input);
+    //     args[2] = NULL;
+    // }
     if (strcmp(args[0], "cd") == 0){
         if(args[1] != NULL){
             mychdir(args[1]);
@@ -109,9 +124,9 @@ void execute_command(char *command){
        else if(pid >0){
         int status;
         wait(&status);
-        if (WIFEXITED(status)){
-            printf("Process exited with status: $d\n", WEXITSTATUS(status));
-        }
+        // if (WIFEXITED(status)){
+        //     printf("Process exited with status: %d\n", WEXITSTATUS(status));
+        // }
        }
        else{
         perror("Fork");
@@ -146,6 +161,7 @@ void handle_pipe(char *input) { //added for merge
         // exit(EXIT_FAILURE);
 
         char **args1 = split_line(cmd1, " ");
+        handle_redirection(args1);
         execvp(args1[0], args1);
         perror("execvp failed for the first command");
         exit(1);
@@ -160,6 +176,7 @@ void handle_pipe(char *input) { //added for merge
         // run(cmd2);
         // exit(EXIT_FAILURE);
         char **args2 = split_line(cmd2, " ");
+        handle_redirection(args2);
         execvp(args2[0], args2);
         perror("execvp failed for the second command");
         exit(1);
@@ -169,13 +186,13 @@ void handle_pipe(char *input) { //added for merge
     close(pipefd[0]);
     close(pipefd[1]);
     wait(&status);
-    if(WIFEXITED(status)){
-        printf("First child exited with status %d\n", WEXITSTATUS(status));
-    }
+    // if(WIFEXITED(status)){
+    //     printf("First child exited with status %d\n", WEXITSTATUS(status));
+    // }
     wait(&status);
-    if(WIFEXITED(status)){
-        printf("First child exited with status %d\n", WEXITSTATUS(status));
-    }
+    // if(WIFEXITED(status)){
+    //     printf("First child exited with status %d\n", WEXITSTATUS(status));
+    // }
 }
 
 void execute_line(char *line){ //process line into commands
