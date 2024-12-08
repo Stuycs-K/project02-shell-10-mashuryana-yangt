@@ -75,7 +75,16 @@ void execute_command(char *command){
         free(args);
         return;
     }
-    
+    if (strchr(command, '>')){
+        char *output = args[2];
+        redirectOut(output);
+        args[2] = NULL;
+    }
+    else if(strchr(command, '<')){
+        char *input = args[2];
+        redirectIn(input);
+        args[2] = NULL;
+    }
     if (strcmp(args[0], "cd") == 0){
         if(args[1] != NULL){
             mychdir(args[1]);
