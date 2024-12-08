@@ -181,7 +181,12 @@ void handle_pipe(char *input) { //added for merge
 void execute_line(char *line){ //process line into commands
     char **commands = split_line(line, ";"); //splitter func
     for(int i =0; commands[i]!=NULL; i++){
+        if(strchr(commands[i], '|')){
+            handle_pipe(commands[i]);
+        }
+        else{
         execute_command(commands[i]); //command executer func
+    }
     }
     free(commands);
 
