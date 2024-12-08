@@ -3,6 +3,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <fcntl.h>
 #include "shell.h"
 
 char **split_line(char *line, const char *delim){
@@ -46,16 +47,26 @@ void mygetcwd() { //added for merging
     }
 }
 
-int redirectOut(char *newOut) { //added for merge 
+void redirectOut(char *newOut) { //added for merge 
     int fd = open(newOut, O_WRONLY | O_CREAT | O_TRUNC, 0644);
     if (fd < 0) {
         perror("open failed");
-        return -1;
+        exit(1);
     }
-    int backup_stdout = dup(STDOUT_FILENO);
+    // int backup_stdout = dup(STDOUT_FILENO);
     dup2(fd, STDOUT_FILENO);
     close(fd);
-    return backup_stdout;
+    // return backup_stdout;
+}
+
+void redirectIn(char *filename){
+    int fd = open(filename, O_RDONLY);
+    if (fd < 0){
+        perror("open failed");
+        exit(1);
+    }
+    dup2(fd, STDIN_FILENO);
+    close(fd);
 }
 
 void execute_command(char *command){
@@ -64,17 +75,22 @@ void execute_command(char *command){
         free(args);
         return;
     }
+    
     if (strcmp(args[0], "cd") == 0){
-        if(args[1] == NULL || chdir(args[1])!= 0){
-            perror("cd");
+        if(args[1] != NULL){
+            mychdir(args[1]);
         }
-    }
-    else if(strcmp(args[0], "exit") == 0){
+        else{
+            printf("cd missing argument\n");
+        }
+        free(args);
+        return;
+        }
+    if(strcmp(args[0], "exit") == 0){
         printf("Exiting shell...\n");
         free(args);
         exit(0);
     }
-    else{
        pid_t pid = fork();
        if(pid == 0){
         execvp(args[0], args);
@@ -91,7 +107,7 @@ void execute_command(char *command){
        else{
         perror("Fork");
        }
-    }
+    
     free(args);
 }
 void execute_line(char *line){ //process line into commands
