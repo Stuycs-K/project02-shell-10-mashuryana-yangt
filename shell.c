@@ -194,13 +194,13 @@ void execute_line(char *line){ //process line into commands
 int main(){
     char directory[1024];
     while(1){
-        if (getcwd(directory, sizeof(directory) != NULL)){
-            printf("%s $", directory);
+        mygetcwd();
+            printf(" $");
             fflush(stdout);
-        }
+        
         char line[1024];
         if(fgets(line, 1024, stdin) == NULL){
-            printf("Exiting shell");
+            printf("\nExiting shell...\n");
             break;
         }
         int length = 0;
