@@ -7,28 +7,29 @@ Creative Group Name: Yangela
 
 Code/Documentation:
 
-//     Every function you write must have a function header comment describing the arguments, return value and what the function does.
-//     Use modular design liberally. This is a large program.
-//     You should have a readme file with the following:
-//         All group member's names
-//         Your group's "creative team name" where you can optionally flex on other groups by making a really good name.
-//         A description of what features your shell implements
-//         A description of what features you attempted to implement but were unsuccessful
-//         Any bugs or things you want me to know about your program
-//         I am much more forgiving of reported bugs than bugs I discover while testing
-//         A copy of every function header
-//     This project should use separate C files as necessary.
-//     Restrictions on input (to make your job easier):
-//         Command line arguments will be separated by single spaces. (Except the semicolon)
-//         I will only test a single pipe |
-//         I will only test up to one >
-//         I will only use the > syntax, not the 2> or &>
-//         < would go after the first command only,
-//         > would go at the end of the command only.
-//         e.g.
+The shell can execute standard commands with arguments such as echo and ls. Arguments are parsed and passed to the execvp() function for executing. 
 
-//         a < c.txt | b  > d.txt
+Input (<) and output(>) redirection are supported:
+cmd > file.txt: Redirects output of cmd to a file(file.txt)
+cmd < file.txt: Takes the input from a file (file.txt) for cmd.
 
-//         This would cause: c.txt goes into program a, the output of a goes into program b, the output of b goes into the file d.txt )
-//     If you would like to implement other features after getting these ones down, please do. Look at what bash does and see what else you can do!
+Simple piping (|) is supported between two commands, such as ls | wc -l where the output of ls is passed as the input to wc.
+
+Built-in commands include cd for changing directories and exit for terminating the shell.
+
+The shell prompt displays the current working directory and uses ~ for the home directory.
+
+Function Headers:
+char **split_line(char *line, const char *delim);
+void mychdir(char *path);
+void mygetcwd();
+void redirectOut(char *newOut);
+void redirectIn(char *filename);
+void handle_redirection(char **args);
+void execute_command(char *command);
+void handle_pipe(char *input);
+void execute_line(char *line);
+int main();
+
+
 // Due: Monday 12/09 8:00 am
