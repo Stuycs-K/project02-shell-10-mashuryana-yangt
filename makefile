@@ -1,5 +1,5 @@
 .PHONY: clean run compile
-
+all: clean compile run
 clean: 
 	@rm -f *.o shell
 compile: shell
